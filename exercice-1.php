@@ -2,6 +2,18 @@
 
 function evaluate($expression){
     // TODO : add rendering code here
+
+    $result = 0;
+
+    if($expression['type'] == 'add'){
+        foreach($expression['children'] as $children){
+            if($children['type'] == 'number'){
+                $result += $children['value'];
+            }
+        }
+    }
+    return $result;
+
 }
 
 // 100 + 200 + 300
@@ -84,6 +96,6 @@ $expression3 = [
 
 echo "Expression 1 evaluates to: " . evaluate($expression1) . " <br>";
 
-echo "Expression 2 evaluates to: " . evaluate($expression2) . " <br>";
+//echo "Expression 2 evaluates to: " . evaluate($expression2) . " <br>";
 
-echo "Expression 3 evaluates to: " . evaluate($expression3) . " <br>";
+//echo "Expression 3 evaluates to: " . evaluate($expression3) . " <br>";
