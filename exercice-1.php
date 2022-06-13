@@ -3,48 +3,41 @@
 function evaluate($expression){
     // TODO : add rendering code here
 
-    echo "<pre>EEEEEEEEEEVAL :";
-    print_r($expression);
+    //echo "<pre>EVAL :";    
 
     $result = 0;
 
     if($expression['type'] != 'number'){
 
-        foreach($expression['children'] as $children){
-
-            if($children['type'] == 'number'){
-
-                if ($expression['type'] == 'add') {
-                    $result += $children['value'];
-                } else if($expression['type'] == 'multiply'){
-                    if($result == 0){
-                        $result = $children['value'];
-                    } else {
-                        $result = $result * $children['value'];
+        
+        if ($expression['type'] != 'fraction') {
+            foreach ($expression['children'] as $children) {
+                if ($children['type'] == 'number') {
+                    if ($expression['type'] == 'add') {
+                        $result += $children['value'];
+                    } elseif ($expression['type'] == 'multiply') {
+                        if ($result == 0) {
+                            $result = $children['value'];
+                        } else {
+                            $result = $result * $children['value'];
+                        }
+                    }
+                } else {
+                    if ($expression['type'] == 'add') {                        
+                        $result += evaluate($children);
+                    } elseif ($expression['type'] == 'multiply') {                        
+                        $result = $result * evaluate($children);
                     }
                 }
-
-            } else {   
-                
-                
-
-                if ($expression['type'] == 'add') {
-                    $result += evaluate($children);
-                } else if($expression['type'] == 'multiply'){
-                    $result = $result * evaluate($children);
-                }
-
-                
+            
             }
-            echo "RESULT : $result";
+        } else {
+            return $expression['top']['value'] / $expression['bottom']['value'];
         }
-    }
-    
-    
+    }   
 
-    echo "</pre>";
+    //echo "</pre>";
     return $result;
-
 }
 
 // 100 + 200 + 300
