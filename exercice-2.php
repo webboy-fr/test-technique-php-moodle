@@ -1,43 +1,33 @@
 <?php
 
 function evaluate($expression){
-  
     $result = 0;
-    $html = '';
+    $type = $expression['type'];
 
-    if($expression['type'] != 'number'){
-
-        
-        if ($expression['type'] != 'fraction') {
+    if($type != 'number'){        
+        if ($type != 'fraction') {
             foreach ($expression['children'] as $children) {
-                if ($children['type'] == 'number') {
-                    if ($expression['type'] == 'add') {
+                if ($children['type'] == 'number') { //Simple operation
+                    if ($type == 'add') {
                         $result += $children['value'];
-                        $html .= "<div class='{$expression['type']}'> {$children['value']} +</div>";
-                    } elseif ($expression['type'] == 'multiply') {
-                        if ($result == 0) {
-                            $result = $children['value'];
-                        } else {
-                            $result = $result * $children['value'];
-                        }
+                    } elseif ($type == 'multiply') {
+                        //No multplication by zero + ternary
+                        $result = ($result == 0) ? $children['value'] :  $result * $children['value'];                         
                     }
-                } else {
-                    if ($expression['type'] == 'add') {                        
+                } else { //Must dive deeper (recursivity)
+                    if ($type == 'add') {                        
                         $result += evaluate($children);
-                    } elseif ($expression['type'] == 'multiply') {                        
+                    } elseif ($type == 'multiply') {                        
                         $result = $result * evaluate($children);
                     }
-                }
-            
+                }            
             }
         } else {
+            //Fraction looks simpler, so I didn't have implement recursivity for it :) (but I could...)
             return $expression['top']['value'] / $expression['bottom']['value'];
         }
     }   
-
- 
     return $result;
-  
 }
 
 
@@ -45,18 +35,24 @@ function render($expression){
     $html = '';
 
     if($expression['type'] != 'number'){          
-
+            $i = 0;
             foreach ($expression['children'] as $children) {
-            
-
                 if ($children['type'] == 'number') {
 
                     if ($expression['type'] == 'add') {                       
-                        $html .= "<div class='{$expression['type']}'> {$children['value']} + </div>";
+                        $html .= "<div class='{$expression['type']}'> {$children['value']}";
+                        if(isset($expression['children'][$i+1])){ //Write + only if there is a next element
+                            $html .= " + ";
+                        } 
+                        $html .= "</div>";
+
                     } elseif ($expression['type'] == 'multiply') {                       
-                        $html .= "<div class='{$expression['type']}'> {$children['value']} * </div>";
+                        $html .= "<div class='{$expression['type']}'> {$children['value']}";
+                        if(isset($expression['children'][$i+1])){ //Write * only if there is a next element
+                            $html .= " * ";
+                        } 
+                        $html .= "</div>";
                     }
-                   
                 } else {
 
                     if($children['type'] == 'fraction'){
@@ -66,7 +62,8 @@ function render($expression){
                     } else {
                         $html .= "(".render($children).")";
                     }
-                }            
+                }                   
+                $i++;
             }      
     }       
     return $html;
