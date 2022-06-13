@@ -3,15 +3,46 @@
 function evaluate($expression){
     // TODO : add rendering code here
 
+    echo "<pre>EEEEEEEEEEVAL :";
+    print_r($expression);
+
     $result = 0;
 
-    if($expression['type'] == 'add'){
+    if($expression['type'] != 'number'){
+
         foreach($expression['children'] as $children){
+
             if($children['type'] == 'number'){
-                $result += $children['value'];
+
+                if ($expression['type'] == 'add') {
+                    $result += $children['value'];
+                } else if($expression['type'] == 'multiply'){
+                    if($result == 0){
+                        $result = $children['value'];
+                    } else {
+                        $result = $result * $children['value'];
+                    }
+                }
+
+            } else {   
+                
+                
+
+                if ($expression['type'] == 'add') {
+                    $result += evaluate($children);
+                } else if($expression['type'] == 'multiply'){
+                    $result = $result * evaluate($children);
+                }
+
+                
             }
+            echo "RESULT : $result";
         }
     }
+    
+    
+
+    echo "</pre>";
     return $result;
 
 }
@@ -96,6 +127,6 @@ $expression3 = [
 
 echo "Expression 1 evaluates to: " . evaluate($expression1) . " <br>";
 
-//echo "Expression 2 evaluates to: " . evaluate($expression2) . " <br>";
+echo "Expression 2 evaluates to: " . evaluate($expression2) . " <br>";
 
-//echo "Expression 3 evaluates to: " . evaluate($expression3) . " <br>";
+echo "Expression 3 evaluates to: " . evaluate($expression3) . " <br>";
