@@ -1,40 +1,35 @@
 <?php
 
-
-
-
-
-interface expression_tree_node{
+interface expression_tree_node
+{
     public function evaluate();
     public function render();
 }
 
 
-class Operations implements expression_tree_node{
+class Operations implements expression_tree_node
+{
+    private array $expression =  [];
 
-    private Array $expression =  [];
-
-    public function __construct($expression){
-        //$this->evaluate($expression);
+    public function __construct($expression)
+    {
         $this->expression = $expression;
     }
 
 
-    public function evaluate(){
-  
+    public function evaluate()
+    {
         $result = 0;
-        $html = '';
+        $type = $this->expression['type'];
+        
     
-        if($this->expression['type'] != 'number'){
-    
-            
-            if ($this->expression['type'] != 'fraction') {
+        if ($type != 'number') {
+            if ($type != 'fraction') {
                 foreach ($this->expression['children'] as $children) {
                     if ($children['type'] == 'number') {
-                        if ($this->expression['type'] == 'add') {
+                        if ($type == 'add') {
                             $result += $children['value'];
-                            $html .= "<div class='{$this->expression['type']}'> {$children['value']} +</div>";
-                        } elseif ($this->expression['type'] == 'multiply') {
+                        } elseif ($type == 'multiply') {
                             if ($result == 0) {
                                 $result = $children['value'];
                             } else {
@@ -42,64 +37,66 @@ class Operations implements expression_tree_node{
                             }
                         }
                     } else {
-                        if ($this->expression['type'] == 'add') {                        
-                            //$result += $this->evaluate($children);
+                        if ($type == 'add') {
+                            //Recursivity
                             $operation = new Operations($children);
                             $result += $operation->evaluate($children);
-                        } elseif ($this->expression['type'] == 'multiply') {                        
-                            //$result = $result * $this->evaluate($children);
+                        } elseif ($type == 'multiply') {
+                            //Recursivity
                             $operation = new Operations($children);
                             $result = $result * $operation->evaluate($children);
                         }
                     }
-                
                 }
             } else {
                 return $this->expression['top']['value'] / $this->expression['bottom']['value'];
             }
-        }   
-    
-     
+        }
         return $result;
-      
     }
     
     
-    public function render(){        
+    public function render()
+    {
         $html = '';
+        $type = $this->expression['type'];
+
     
-        if($this->expression['type'] != 'number'){          
-    
-                foreach ($this->expression['children'] as $children) {
-                
-    
-                    if ($children['type'] == 'number') {
-    
-                        if ($this->expression['type'] == 'add') {                       
-                            $html .= "<div class='{$this->expression['type']}'> {$children['value']} + </div>";
-                        } elseif ($this->expression['type'] == 'multiply') {                       
-                            $html .= "<div class='{$this->expression['type']}'> {$children['value']} * </div>";
+        if ($type != 'number') {
+            $i = 0;
+            foreach ($this->expression['children'] as $children) {
+                if ($children['type'] == 'number') {
+                    if ($type == 'add') {
+                        $html .= "<div class='{$type}'>{$children['value']}";
+                        if (isset($this->expression['children'][$i+1])) { //Write + only if there is a next element
+                            $html .= "&nbsp;+&nbsp;"; //Sorry
                         }
-                       
+                        $html .= "</div>";
+                    } elseif ($type == 'multiply') {
+                        $html .= "<div class='{$type}'>{$children['value']}";
+                        if (isset($this->expression['children'][$i+1])) { //Write * only if there is a next element
+                            $html .= "&nbsp;*&nbsp;"; //Sorry
+                        }
+                        $html .= "</div>";
+                    }
+                } else {
+                    if ($children['type'] == 'fraction') {
+                        $html .= "<div class='{$children['type']}'> <div>{$children['top']['value']}</div>";
+                        $html .= "<div>{$children['bottom']['value']}</div>";
+                        $html .= "</div>";
                     } else {
-    
-                        if($children['type'] == 'fraction'){
-                            $html .= "<div class='{$children['type']}'> <div>{$children['top']['value']}</div>";                        
-                            $html .= "<div>{$children['bottom']['value']}</div>";
-                            $html .= "</div>";
-                        } else {
-                            $operation = new Operations($children);
-                            $html .= "(".$operation->render($children).")";
-                        }
-                    }            
-                }      
-        }    
+                        $operation = new Operations($children);
+                        $html .= "(".$operation->render($children).")";
+                    }
+                }
+                
+                $i++;
+            }
+        }
         
      
         return $html;
     }
-
-
 }
 
 
@@ -200,34 +197,28 @@ $expression3 = [
             align-items: center;
 
         }
-        .operation div{
-            margin:5px;
+        .fraction{
+            display:flex;
+            flex-direction: column;
+            text-align: center;
         }
-
- 
-.fraction{
-    display:flex;
-    flex-direction: column;
-    text-align: center;
-}
-.fraction div:first-child{
-    border-bottom:solid 1px black;
-}
+        .fraction div:first-child{
+            border-bottom:solid 1px black;
+        }
     </style>
 </head>
 <body>
-    <?php 
+    <?php
+    //Sorry for non breakable spaces, I don't have the time... ^^
 
+    $operation = new Operations($expression1);
+    echo "<div class='operation'>".$operation->render(). "&nbsp;= " . $operation->evaluate() . " </div>";
 
+    $operation = new Operations($expression2);
+    echo "<div class='operation'>".$operation->render(). "&nbsp;= " . $operation->evaluate() . " </div>";
 
-$operation = new Operations($expression1);
-echo "<div class='operation'>".$operation->render(). " = " . $operation->evaluate() . " </div>";
-
-$operation = new Operations($expression2);
-echo "<div class='operation'>".$operation->render(). " = " . $operation->evaluate() . " </div>";
-
-$operation = new Operations($expression3);
-echo "<div class='operation'>".$operation->render(). " = " . $operation->evaluate() . " </div>";
-?>
+    $operation = new Operations($expression3);
+    echo "<div class='operation'>".$operation->render(). "&nbsp;= " . $operation->evaluate() . " </div>";
+    ?>
 </body>
 </html>

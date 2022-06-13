@@ -33,21 +33,22 @@ function evaluate($expression){
 
 function render($expression){
     $html = '';
+    $type = $expression['type'];
 
-    if($expression['type'] != 'number'){          
+    if($type != 'number'){          
             $i = 0;
             foreach ($expression['children'] as $children) {
                 if ($children['type'] == 'number') {
 
-                    if ($expression['type'] == 'add') {                       
-                        $html .= "<div class='{$expression['type']}'>{$children['value']}";
+                    if ($type == 'add') {                       
+                        $html .= "<div class='{$type}'>{$children['value']}";
                         if(isset($expression['children'][$i+1])){ //Write + only if there is a next element
                             $html .= "&nbsp;+&nbsp;"; //Sorry
                         } 
                         $html .= "</div>";
 
-                    } elseif ($expression['type'] == 'multiply') {                       
-                        $html .= "<div class='{$expression['type']}'>{$children['value']}";
+                    } elseif ($type == 'multiply') {                       
+                        $html .= "<div class='{$type}'>{$children['value']}";
                         if(isset($expression['children'][$i+1])){ //Write * only if there is a next element
                             $html .= "&nbsp;*&nbsp;"; //Sorry
                         } 
