@@ -40,16 +40,16 @@ function render($expression){
                 if ($children['type'] == 'number') {
 
                     if ($expression['type'] == 'add') {                       
-                        $html .= "<div class='{$expression['type']}'> {$children['value']}";
+                        $html .= "<div class='{$expression['type']}'>{$children['value']}";
                         if(isset($expression['children'][$i+1])){ //Write + only if there is a next element
-                            $html .= " + ";
+                            $html .= "&nbsp;+&nbsp;"; //Sorry
                         } 
                         $html .= "</div>";
 
                     } elseif ($expression['type'] == 'multiply') {                       
-                        $html .= "<div class='{$expression['type']}'> {$children['value']}";
+                        $html .= "<div class='{$expression['type']}'>{$children['value']}";
                         if(isset($expression['children'][$i+1])){ //Write * only if there is a next element
-                            $html .= " * ";
+                            $html .= "&nbsp;*&nbsp;"; //Sorry
                         } 
                         $html .= "</div>";
                     }
@@ -159,33 +159,30 @@ $expression3 = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-
         .operation{
             display:flex;
             align-items: center;
 
         }
         .operation div{
-            margin:5px;
+            
+        } 
+        .fraction{
+            display:flex;
+            flex-direction: column;
+            text-align: center;
         }
-
- 
-.fraction{
-    display:flex;
-    flex-direction: column;
-    text-align: center;
-}
-.fraction div:first-child{
-    border-bottom:solid 1px black;
-}
+        .fraction div:first-child{
+            border-bottom:solid 1px black;
+        }
     </style>
 </head>
 <body>
-    <?php 
-
-echo "<div class='operation'>".render($expression1). " = " . evaluate($expression1) . " </div>";
-echo "<div class='operation'>".render($expression2). " = " . evaluate($expression2) . " </div>";
-echo "<div class='operation'>".render($expression3). " = " . evaluate($expression3) . " </div>";
-?>
+    <?php
+    //Can be merged in another global function if needed...
+    echo "<div class='operation'>".render($expression1). " = " . evaluate($expression1) . " </div>";
+    echo "<div class='operation'>".render($expression2). " = " . evaluate($expression2) . " </div>";
+    echo "<div class='operation'>".render($expression3). " = " . evaluate($expression3) . " </div>";
+    ?>
 </body>
 </html>
