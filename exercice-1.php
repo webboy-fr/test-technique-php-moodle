@@ -1,42 +1,32 @@
 <?php
 
 function evaluate($expression){
-    // TODO : add rendering code here
-
-    //echo "<pre>EVAL :";    
-
     $result = 0;
+    $type = $expression['type'];
 
-    if($expression['type'] != 'number'){
-
-        
-        if ($expression['type'] != 'fraction') {
+    if($type != 'number'){        
+        if ($type != 'fraction') {
             foreach ($expression['children'] as $children) {
-                if ($children['type'] == 'number') {
-                    if ($expression['type'] == 'add') {
+                if ($children['type'] == 'number') { //Simple operation
+                    if ($type == 'add') {
                         $result += $children['value'];
-                    } elseif ($expression['type'] == 'multiply') {
-                        if ($result == 0) {
-                            $result = $children['value'];
-                        } else {
-                            $result = $result * $children['value'];
-                        }
+                    } elseif ($type == 'multiply') {
+                        //No multplication by zero + ternary
+                        $result = ($result == 0) ? $children['value'] :  $result * $children['value'];                         
                     }
-                } else {
-                    if ($expression['type'] == 'add') {                        
+                } else { //Must dive deeper (recursivity)
+                    if ($type == 'add') {                        
                         $result += evaluate($children);
-                    } elseif ($expression['type'] == 'multiply') {                        
+                    } elseif ($type == 'multiply') {                        
                         $result = $result * evaluate($children);
                     }
-                }
-            
+                }            
             }
         } else {
+            //Fraction looks simpler, so I didn't have implement recursivity for it :) (but I could...)
             return $expression['top']['value'] / $expression['bottom']['value'];
         }
     }   
-
-    //echo "</pre>";
     return $result;
 }
 
@@ -119,7 +109,5 @@ $expression3 = [
 ];
 
 echo "Expression 1 evaluates to: " . evaluate($expression1) . " <br>";
-
 echo "Expression 2 evaluates to: " . evaluate($expression2) . " <br>";
-
 echo "Expression 3 evaluates to: " . evaluate($expression3) . " <br>";
